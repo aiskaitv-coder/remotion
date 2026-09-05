@@ -1244,7 +1244,8 @@
   "engine": "web/src/engine.js v1.1 (DATA_STORY_3D_BRIGHT_V1 browser port)",
   "fonts": "DejaVu Sans Bold/Regular subset (embedded)",
   "flags": "DE FR IT GR EU ES FI CZ PL PT",
-  "availability": "available in repo aiskaitv-coder/remotion, branch claude/data-story-reels-shorts-2spn51"
+  "availability": "available in repo aiskaitv-coder/remotion, branch claude/data-story-reels-shorts-2spn51",
+  "deliverable": "DATA_STORY_ANERGIA.stage.html (Claude2Video Stage Export Format) — upload to https://claude2video.com/ for MP4; local MP4 rendered as independent verification"
  },
  "visual_review": {
   "version": "v1",
@@ -1308,11 +1309,12 @@
  "execution": {
   "specification_status": "specification_complete",
   "preview_status": "complete",
-  "render_status": "in_progress",
+  "render_status": "render_complete",
   "visual_qa_status": "approved",
   "blockers": [
    "C06 (10,1% έτος 2024) προς επαλήθευση στο une_rt_a",
    "U18/U19 έτος 2024· 2025 προς επαλήθευση στο une_ltu_a"
-  ]
+  ],
+  "render_evidence": "web/dist/DATA_STORY_ANERGIA.mp4 · 1777 frames · 71.08 s · 1080x1920 · 25 fps · H.264 yuv420p · 3.56 MB · full decode OK · frame 0 vs approved cover MAE 1.31 (codec) · no empty frame at any of 8 scene boundaries · 7058 s wall on CPU"
  }
 }

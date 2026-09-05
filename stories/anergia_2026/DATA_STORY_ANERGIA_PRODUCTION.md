@@ -1550,27 +1550,78 @@
   "engine": "web/src/engine.js v1.1 (DATA_STORY_3D_BRIGHT_V1 browser port)",
   "fonts": "DejaVu Sans Bold/Regular subset (embedded)",
   "flags": "DE FR IT GR EU ES FI CZ PL PT",
-  "availability": "available in repo aiskaitv-coder/remotion, branch claude/data-story-reels-shorts-2spn51"
+  "availability": "available in repo aiskaitv-coder/remotion, branch claude/data-story-reels-shorts-2spn51",
+  "deliverable": "DATA_STORY_ANERGIA.stage.html (Claude2Video Stage Export Format) — upload to https://claude2video.com/ for MP4; local MP4 rendered as independent verification"
  },
  "visual_review": {
   "version": "v1",
-  "preview_status": "pending",
-  "asset_paths": [],
-  "scene_timestamps": [],
+  "preview_status": "complete",
+  "asset_paths": [
+   "stories/anergia_2026/review/cover_frame0.png",
+   "stories/anergia_2026/review/scene_01_S01_*.png",
+   "stories/anergia_2026/review/scene_02_S02_*.png",
+   "stories/anergia_2026/review/scene_03_S03_*.png",
+   "stories/anergia_2026/review/scene_04_S04_*.png",
+   "stories/anergia_2026/review/scene_05_S05_*.png",
+   "stories/anergia_2026/review/scene_06_S06_*.png",
+   "stories/anergia_2026/review/scene_07_S07_*.png",
+   "stories/anergia_2026/review/scene_08_S08_*.png",
+   "stories/anergia_2026/review/scene_09_S09_*.png",
+   "stories/anergia_2026/review/contact_sheet.png"
+  ],
+  "scene_timestamps": [
+   {
+    "id": "S01",
+    "settled_at_ms": 9220
+   },
+   {
+    "id": "S02",
+    "settled_at_ms": 15620
+   },
+   {
+    "id": "S03",
+    "settled_at_ms": 22020
+   },
+   {
+    "id": "S04",
+    "settled_at_ms": 30700
+   },
+   {
+    "id": "S05",
+    "settled_at_ms": 37100
+   },
+   {
+    "id": "S06",
+    "settled_at_ms": 44140
+   },
+   {
+    "id": "S07",
+    "settled_at_ms": 50540
+   },
+   {
+    "id": "S08",
+    "settled_at_ms": 57980
+   },
+   {
+    "id": "S09",
+    "settled_at_ms": 70380
+   }
+  ],
   "renderer_version": "engine 1.1",
   "data_version": "anergia_2026 v1",
-  "approval_status": "pending",
-  "approved_version": null
+  "approval_status": "approved_2026-09-05 (user: 'ναι εγκρινω')",
+  "approved_version": "v1"
  },
  "execution": {
   "specification_status": "specification_complete",
-  "preview_status": "pending",
-  "render_status": "not_run",
-  "visual_qa_status": "pending",
+  "preview_status": "complete",
+  "render_status": "render_complete",
+  "visual_qa_status": "approved",
   "blockers": [
    "C06 (10,1% έτος 2024) προς επαλήθευση στο une_rt_a",
    "U18/U19 έτος 2024· 2025 προς επαλήθευση στο une_ltu_a"
-  ]
+  ],
+  "render_evidence": "web/dist/DATA_STORY_ANERGIA.mp4 · 1777 frames · 71.08 s · 1080x1920 · 25 fps · H.264 yuv420p · 3.56 MB · full decode OK · frame 0 vs approved cover MAE 1.31 (codec) · no empty frame at any of 8 scene boundaries · 7058 s wall on CPU"
  }
 }
 ```
@@ -1583,9 +1634,11 @@
 | fonts | DejaVu Sans Bold/Regular subset (embedded) | ναι |
 | flags | DE FR IT GR EU ES FI CZ PL PT | ναι |
 | availability | available in repo aiskaitv-coder/remotion, branch claude/data-story-reels-shorts-2spn51 | ναι |
-| Built page | web/dist/DATA_STORY_ANERGIA.html · sha256 aa3b176a3ee606d8 | ναι |
-| Review package | web/dist/review_anergia/ (cover, 9 stills, contact sheet) | ναι |
-| MP4 | — | όχι ακόμη (μετά την οπτική έγκριση) |
+| deliverable | DATA_STORY_ANERGIA.stage.html (Claude2Video Stage Export Format) — upload to https://claude2video.com/ for MP4; local MP4 rendered as independent verification | ναι |
+| Built page | web/dist/DATA_STORY_ANERGIA.html · sha256 94c476a004c99996 | ναι |
+| Stage export (παραδοτέο) | stories/anergia_2026/DATA_STORY_ANERGIA.stage.html + stage_project.zip | ναι |
+| Review package | stories/anergia_2026/review/ (cover, 9 stills, contact sheet) | ναι |
+| MP4 (τοπική επαλήθευση) | web/dist/DATA_STORY_ANERGIA.mp4 · 1.777 καρέ · 71,08 s | ναι, εκτός repo |
 | Audio | — | όχι |
 
 ## 8. Οδηγία Claude Design / renderer
@@ -1617,9 +1670,9 @@ Render a complete static cover at frame zero. Animate only after its hold. Autop
 | Q11 | Footer ≥30 px ≤2 γραμμές· τίτλοι ≥84 px· hero row εντός 998 px | PASS | validator με μετρικές DejaVu + render χωρίς σφάλμα |
 | Q12 | Στατικό εξώφυλλο frame 0 με τελικό KPI | PASS | review_anergia/cover_frame0.png |
 | Q13 | Ένα settled still ανά σκηνή, τιμές/σημαίες/πηγή ορατές | PASS | review_anergia/scene_01…09 + contact_sheet.png (οπτικός έλεγχος) |
-| Q14 | MP4 1080×1920 25 fps, full decode, καρέ = 1.777 | NOT_RUN | Εκκρεμεί οπτική έγκριση |
+| Q14 | MP4 1080×1920 25 fps, full decode, καρέ = 1.777 | PASS | Τοπικό render 7.058 s: 1.777 καρέ, 71,08 s, H.264 yuv420p, 3,56 MB· frame 0 vs cover MAE 1,31 (codec)· κανένα κενό καρέ στα 8 όρια σκηνών |
 | Q15 | Ήχος/VO alignment | NOT_RUN | Δεν υπάρχει ηχητικό αρχείο |
 | Q16 | Επαλήθευση C06 (10,1% έτος 2024) στο une_rt_a | NOT_RUN | Υπολογισμός από U12+U17· ζητήθηκε επαλήθευση στο GPT |
 | Q17 | Νεότερη μακροχρόνια ανεργία 2025 (une_ltu_a) | NOT_RUN | Χρησιμοποιείται 2024 με ορατή χρονοσήμανση |
 
-**Κατάσταση:** specification_complete · preview_complete (stills) · render_status: not_run · visual approval: pending.
+**Κατάσταση:** specification_complete · preview_complete · visual approval: approved_2026-09-05 (user: 'ναι εγκρινω') · render_status: render_complete · παραδοτέο εξαγωγής: DATA_STORY_ANERGIA.stage.html (Claude2Video Stage Export Format), MP4 μέσω claude2video.com· τοπικό MP4 ως ανεξάρτητη επαλήθευση.
