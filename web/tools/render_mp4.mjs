@@ -1,6 +1,6 @@
 // Render a built page to MP4: Playwright drives window.dataStory.render(t) frame by frame at 25 fps,
 // screenshots are piped as PNG into FFmpeg (libx264, yuv420p, 1080×1920).
-// usage: node web/tools/render_mp4.mjs dist/story.html out.mp4 [--fps 25] [--end <seconds>] [--crf 18]
+// usage: node web/tools/render_mp4.mjs dist/story.html out.mp4 [--fps 25] [--start <s>] [--end <s>] [--crf 18]
 import { chromium } from 'playwright'; import path from 'node:path'; import { spawn } from 'node:child_process';
 async function fastPng(page, cdp) {
   const r = await cdp.send('Page.captureScreenshot', { format: 'png', optimizeForSpeed: true, clip: { x: 0, y: 0, width: 1080, height: 1920, scale: 1 } });
@@ -17,11 +17,11 @@ await page.goto('file://' + path.resolve(file) + '?t=0');
 await page.waitForFunction(() => window.__frameReady === true, null, { timeout: 120000 });
 const cdp = await page.context().newCDPSession(page);
 const duration = opt('--end', await page.evaluate(() => window.dataStory.duration));
-const frames = Math.round(duration * fps);
+const startF = Math.round(opt('--start', 0) * fps), frames = Math.round(duration * fps);
 const ff = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'image2pipe', '-vcodec', 'png', '-r', String(fps), '-i', '-',
   '-an', '-c:v', 'libx264', '-preset', 'medium', '-crf', String(crf), '-pix_fmt', 'yuv420p', '-movflags', '+faststart', out], { stdio: ['pipe', 'inherit', 'inherit'] });
 const t0 = Date.now();
-for (let i = 0; i < frames; i++) {
+for (let i = startF; i < frames; i++) {
   const t = i / fps;                                  // integer frame index → exact 40 ms boundaries at 25 fps
   await page.evaluate(t => window.dataStory.render(t), t);
   const png = await fastPng(page, cdp);   // lossless PNG, fast encoder
@@ -29,4 +29,4 @@ for (let i = 0; i < frames; i++) {
   if (i % 50 === 0) console.log(`frame ${i}/${frames} · ${((Date.now() - t0) / 1000).toFixed(1)}s`);
 }
 ff.stdin.end(); await new Promise((res, rej) => ff.on('close', c => c ? rej(new Error('ffmpeg exit ' + c)) : res()));
-await browser.close(); console.log(`DONE ${out} · ${frames} frames · ${duration}s · ${((Date.now() - t0) / 1000).toFixed(0)}s wall`);
+await browser.close(); console.log(`DONE ${out} · ${frames - startF} frames · ${duration}s · ${((Date.now() - t0) / 1000).toFixed(0)}s wall`);

@@ -69,6 +69,8 @@ numpy 2.4.6, Pillow 12.3.0, FFmpeg 7.0.2-static (imageio-ffmpeg), DejaVu Sans σ
 | P11 | Story player: 6 σκηνές, master clock, crossfade 400 ms, cut | PASS | Καρέ 0 / 7,9 / 8,2 / 47,9 s ελέγχθηκαν |
 | P12 | Review package: cover, 1 settled frame/σκηνή, αριθμημένο contact sheet | PASS | `tools/review.py`, 45 s για 7 καρέ |
 | P13 | Ταχύτητα capture | PASS | CDP PNG optimizeForSpeed ≈170 ms/καρέ, lossless (MAE 0 έναντι Playwright PNG) |
+| P14 | Πλήρες MP4 του demo reel από το ίδιο HTML | PASS | 1200 καρέ, 48,00 s, 1080×1920, 25 fps, H.264 yuv420p, 2,1 MB, full decode OK, 81 min wall (SwiftShader) |
+| P15 | Καρέ 0 του MP4 = cover PNG του review package | PASS | MAE 1,35/255 (μόνο απώλεια H.264) |
 
 ## Μη εκτελεσμένοι / εξαρτήσεις
 

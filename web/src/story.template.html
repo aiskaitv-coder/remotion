@@ -29,21 +29,28 @@ html,body{margin:0;background:#121B37;}
   window.__frameReady = false;
   document.fonts.load('700 100px "DataStory DejaVu"').then(() => document.fonts.load('400 100px "DataStory DejaVu"')).then(() => {
     const stage = document.getElementById('stage');
+    // Handoff model (true crossfade, no blank frame): the outgoing scene keeps its final frame for the
+    // transition length while the incoming scene fades in ON TOP via stage opacity. A 'cut' has no tail.
+    // The last scene's declared transition fades its content out to the shared background (end of video).
+    const tr = (sc) => sc.transition ?? { type: 'crossfade', duration_ms: 350 };
     const players = scenes.map((sc, i) => {
-      const prev = scenes[i - 1], own = sc.transition ?? { type: 'crossfade', duration_ms: 350 };
-      const fadeIn = prev ? ((prev.transition ?? { type: 'crossfade', duration_ms: 350 }).type === 'cut' ? 0 : (prev.transition?.duration_ms ?? 350)) : 0;
-      const fadeOut = own.type === 'cut' ? 0 : own.duration_ms;
-      const root = document.createElement('div'); root.className = 'scene'; stage.appendChild(root);
+      const prev = scenes[i - 1], last = i === scenes.length - 1;
+      const inMs = prev && tr(prev).type !== 'cut' ? tr(prev).duration_ms : 0;
+      const root = document.createElement('div'); root.className = 'scene'; stage.appendChild(root);   // later scenes stack on top
       const player = window.DataStoryEngine.mount(root, sc, {
         source_px: prod.render_options?.source_px ?? 30,
         static_cover: !!sc.static_cover, cover_hold_ms: sc.cover_hold_ms ?? 0,
-        fade_in_ms: sc.static_cover ? 0 : fadeIn, fade_out_ms: fadeOut });
-      root.hidden = true; return { sc, player, root };
+        fade_in_ms: 0, fade_out_ms: last && tr(sc).type !== 'cut' ? tr(sc).duration_ms : 0 });
+      root.style.position = 'absolute'; root.style.left = '0'; root.style.top = '0';   // mount() resets cssText; scenes must overlap
+      root.hidden = true; return { sc, player, root, inMs, tailMs: !last && tr(sc).type !== 'cut' ? tr(sc).duration_ms : 0 };
     });
     function render(T) {
-      for (const { sc, player, root } of players) {
-        const local = T - sc.start_ms / 1000, on = local >= 0 && local < sc.duration_ms / 1000;
-        root.hidden = !on; if (on) player.render(local);
+      for (const { sc, player, root, inMs, tailMs } of players) {
+        const start = sc.start_ms / 1000, dur = sc.duration_ms / 1000, local = T - start;
+        const on = local >= 0 && local < dur + tailMs / 1000;
+        root.hidden = !on; if (!on) continue;
+        root.style.opacity = inMs > 0 && !sc.static_cover ? window.DataStoryEngine.ease(local / (inMs / 1000)) : 1;
+        player.render(Math.min(local, dur - 0.001));   // tail holds the final frame under the incoming scene
       }
     }
     window.dataStory = { render, duration: total, scenes: scenes.map(s => ({ id: s.id, start_ms: s.start_ms, duration_ms: s.duration_ms })) };
