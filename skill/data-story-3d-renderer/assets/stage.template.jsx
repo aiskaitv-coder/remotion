@@ -6,8 +6,8 @@
 // renders any timestamp deterministically: render(t) draws the WebGL geometry and lays out the Greek text
 // for exactly that t. The Stage drives it; the exporter can seek to any frame.
 //
-// Only this import line depends on your Claude Design project: Stage and useTime come from the animations.jsx
-// starter that Claude Design adds to Stage-based projects. Adjust the path if your project keeps it elsewhere.
+// Stage and useTime come from animations.jsx (Claude Design's starter or the bundled runtime); both satisfy the
+// Claude2Video Stage Export Format (type.name 'Stage', first two useState = time, playing; useTime() in seconds).
 import React, { useEffect, useRef, useState } from "react";
 import { Stage, useTime } from "./animations.jsx";
 
@@ -57,7 +57,7 @@ function DataStoryTimeline() {
 export default function {{COMPONENT_NAME}}() {
   // Fixed duration and fps from the production JSON; autoplay with no user interaction.
   return (
-    <Stage width={WIDTH} height={HEIGHT} duration={DURATION} fps={FPS} autoPlay autoplay loop={false}>
+    <Stage width={WIDTH} height={HEIGHT} duration={DURATION} fps={FPS} autoPlay loop={false}>
       <DataStoryTimeline />
     </Stage>
   );

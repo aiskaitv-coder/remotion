@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="el"><head><meta charset="utf-8"><title>DATA STORY · Stage</title>
-<style>html,body{margin:0;background:#121B37;}#root{width:1080px;height:1920px;overflow:hidden;}</style></head>
+<style>html,body{margin:0;background:#121B37;}#root{position:fixed;inset:0;overflow:hidden;}</style></head>
 <body><div id="root"></div>
 <script>
 (() => {
@@ -7283,40 +7283,49 @@
     }
   });
 
-  // .stagebuild.KO8dYs/entry.jsx
+  // .stagebuild.rfsmE9/entry.jsx
   var import_react3 = __toESM(require_react());
   var import_client = __toESM(require_client());
 
-  // .stagebuild.KO8dYs/Story.stage.jsx
+  // .stagebuild.rfsmE9/Story.stage.jsx
   var import_react2 = __toESM(require_react());
 
-  // .stagebuild.KO8dYs/animations.jsx
+  // .stagebuild.rfsmE9/animations.jsx
   var import_react = __toESM(require_react());
   var import_jsx_runtime = __toESM(require_jsx_runtime());
   var TimeCtx = (0, import_react.createContext)(0);
   function useTime() {
     return (0, import_react.useContext)(TimeCtx);
   }
-  function Stage({ width, height, duration, fps = 60, autoPlay = false, loop = true, children }) {
-    const [t, setT] = (0, import_react.useState)(0);
+  function Stage({ width, height, duration, fps = 25, autoPlay = true, loop = true, children }) {
+    const [time, setTime] = (0, import_react.useState)(0);
+    const [playing, setPlaying] = (0, import_react.useState)(autoPlay && !/[?&]__render=1/.test(location.search));
+    const timeRef = (0, import_react.useRef)(0);
+    timeRef.current = time;
     (0, import_react.useEffect)(() => {
       window.__videoMeta = { width, height, duration, fps };
-      window.__seek = (s) => setT(Math.min(Math.max(s, 0), duration));
-      const renderMode = new URLSearchParams(location.search).get("__render") === "1";
-      if (!autoPlay || renderMode) return;
-      let raf, t0 = performance.now();
+      window.__seek = (s) => {
+        setPlaying(false);
+        setTime(Math.min(Math.max(s, 0), duration));
+      };
+      window.__play = () => setPlaying(true);
+    }, [width, height, duration, fps]);
+    (0, import_react.useEffect)(() => {
+      if (!playing) return;
+      const t0 = performance.now() - timeRef.current * 1e3;
+      let raf;
       const step = () => {
         const s = (performance.now() - t0) / 1e3;
-        setT(loop ? s % duration : Math.min(s, duration));
+        setTime(loop ? s % duration : Math.min(s, duration));
         raf = requestAnimationFrame(step);
       };
       raf = requestAnimationFrame(step);
       return () => cancelAnimationFrame(raf);
-    }, [width, height, duration, fps, autoPlay, loop]);
-    return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TimeCtx.Provider, { value: t, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { width, height, overflow: "hidden", position: "relative" }, children }) });
+    }, [playing, duration, loop]);
+    return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TimeCtx.Provider, { value: time, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { style: { width, height, transform: "scale(1)", transformOrigin: "0 0", position: "relative", overflow: "hidden" }, children }) });
   }
 
-  // .stagebuild.KO8dYs/Story.stage.jsx
+  // .stagebuild.rfsmE9/Story.stage.jsx
   var import_jsx_runtime2 = __toESM(require_jsx_runtime());
   (function() {
     "use strict";
@@ -7992,11 +8001,13 @@
     return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { ref: host, style: { width: WIDTH, height: HEIGHT, position: "relative", overflow: "hidden", background: "#121B37" } });
   }
   function DataStoryAnergia() {
-    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Stage, { width: WIDTH, height: HEIGHT, duration: DURATION, fps: FPS, autoPlay: true, autoplay: true, loop: false, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(DataStoryTimeline, {}) });
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Stage, { width: WIDTH, height: HEIGHT, duration: DURATION, fps: FPS, autoPlay: true, loop: false, children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(DataStoryTimeline, {}) });
   }
 
-  // .stagebuild.KO8dYs/entry.jsx
+  // .stagebuild.rfsmE9/entry.jsx
   var import_jsx_runtime3 = __toESM(require_jsx_runtime());
+  window.Stage = Stage;
+  window.useTime = useTime;
   window.__frameReady = false;
   window.__pageError = null;
   window.addEventListener("error", (e) => {

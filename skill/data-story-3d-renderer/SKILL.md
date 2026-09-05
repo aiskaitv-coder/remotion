@@ -92,3 +92,4 @@ steel automatically. Label colors for donut legends are the screen accents liste
 - `references/production-json.md` — every field, per template, with an example
 - `references/locked-design.md` — what is frozen and why, tokens for the record
 - `references/qa-checklist.md` — PASS/FAIL/NOT_RUN checklist for specification and render
+- `references/claude2video-contract.md` — the Stage Export Format and how the bundled runtime meets it
