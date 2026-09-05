@@ -306,8 +306,10 @@
       rect(end, 86, 1532, 101, 1570, '#ff315c', 4); txt(end, 122, 1523, c.legend_selected, 43);
       rect(end, 598, 1532, 613, 1570, '#8fa4c7', 4); txt(end, 634, 1523, c.legend_rest, 43);
       txt(end, 86, 1641, c.legend_note, 30, '#b1bed7', false);
-      return (t, hero) => {
+      return (t, hero, opts) => {
         fadeLayer(end, ease((t - 4.1) / 0.5));
+        // Publication cover: the KPI shows its final verified value from frame 0 and never resets while figures build.
+        if (opts.static_cover) { hero.textContent = c.hero_final; return; }
         let n = 0; for (let i = 0; i < inp.selected_units; i++) if (t >= 1.3 + i * 0.4 + 0.20) n++;
         hero.textContent = (n * 10) + '%';
       };
@@ -335,7 +337,7 @@
       const headerA = opts.static_cover ? 1 : ease((t - 0.12) / 0.65);
       fadeLayer(header.layer, headerA, Math.round(18 * (1 - headerA)));
       content.style.opacity = contentAlpha;
-      update(t, header.hero);
+      update(t, header.hero, opts);
       drawGeometry(ctx, scene, t, contentAlpha);
     }
     return { render, duration, canvas };
