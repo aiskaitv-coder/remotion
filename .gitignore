@@ -1,0 +1,15 @@
+# Build artefacts of the native renderer
+renderer/motion_renderer.so
+*.o
+
+# Rendered outputs (re-created with build_motion_test.py); reference previews live in renderer/previews/
+renderer/*.mp4
+renderer/qa-motion-*.png
+renderer/data-story-3d-*.png
+
+# Python
+__pycache__/
+*.pyc
+
+# Node (for a future web port)
+node_modules/

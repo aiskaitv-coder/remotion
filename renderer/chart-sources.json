@@ -1,0 +1,8 @@
+{
+  "donut": {"is_demo": true, "organization": null, "study": null, "period": null, "url": null},
+  "line": {"is_demo": true, "organization": null, "study": null, "period": null, "url": null},
+  "ranking": {"is_demo": true, "organization": null, "study": null, "period": null, "url": null},
+  "population": {"is_demo": true, "organization": null, "study": null, "period": null, "url": null},
+  "before-after": {"is_demo": true, "organization": null, "study": null, "period": null, "url": null},
+  "stacked": {"is_demo": true, "organization": null, "study": null, "period": null, "url": null}
+}

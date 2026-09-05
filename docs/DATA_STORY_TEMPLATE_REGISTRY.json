@@ -1,0 +1,114 @@
+{
+  "schema_version": "2.0",
+  "design_system": "DATA_STORY_3D_BRIGHT_V1",
+  "runtime": {
+    "engine": "cpp_raymarch_python_pillow_ffmpeg",
+    "generic_production_json_adapter": false,
+    "html_port": false,
+    "gpt_action_connected": false,
+    "static_publication_cover_implemented": false,
+    "demo_source_font_px": 23,
+    "required_production_source_font_px": 30,
+    "demo_export": {
+      "width": 720,
+      "height": 1280,
+      "fps": 25
+    },
+    "versioned_visual_approval_workflow_implemented": false
+  },
+  "templates": [
+    {
+      "template_id": "population_ratio_10",
+      "state": "visual_demo",
+      "native_demo_kind": 3,
+      "parameterized": false,
+      "demonstrated_layout": {
+        "units": 10,
+        "rows": 2,
+        "columns": 5
+      }
+    },
+    {
+      "template_id": "before_after_columns",
+      "state": "visual_demo",
+      "native_demo_kind": 4,
+      "parameterized": false,
+      "demonstrated_layout": {
+        "columns": 2
+      }
+    },
+    {
+      "template_id": "stacked_100",
+      "state": "visual_demo",
+      "native_demo_kind": 5,
+      "parameterized": false,
+      "demonstrated_layout": {
+        "groups": 2,
+        "parts_per_group": 2
+      }
+    },
+    {
+      "template_id": "donut_parts",
+      "state": "visual_demo",
+      "native_demo_kind": 0,
+      "parameterized": false,
+      "demonstrated_layout": {
+        "parts": 4
+      }
+    },
+    {
+      "template_id": "line_single",
+      "state": "visual_demo",
+      "native_demo_kind": 1,
+      "parameterized": false,
+      "demonstrated_layout": {
+        "series": 1,
+        "observations": 5
+      }
+    },
+    {
+      "template_id": "ranking_horizontal",
+      "state": "visual_demo",
+      "native_demo_kind": 2,
+      "parameterized": false,
+      "demonstrated_layout": {
+        "bars": 4
+      }
+    },
+    {
+      "template_id": "hero_kpi",
+      "state": "planned",
+      "parameterized": false
+    },
+    {
+      "template_id": "waffle_100",
+      "state": "planned",
+      "parameterized": false
+    },
+    {
+      "template_id": "line_dual",
+      "state": "planned",
+      "parameterized": false
+    },
+    {
+      "template_id": "timeline",
+      "state": "planned",
+      "parameterized": false
+    },
+    {
+      "template_id": "diverging_bars",
+      "state": "planned",
+      "parameterized": false
+    },
+    {
+      "template_id": "waterfall",
+      "state": "planned",
+      "parameterized": false
+    }
+  ],
+  "reference_sha256": {
+    "motion_renderer.cpp": "458b59d8b6f32bb8939de28e0a29a904c562736950cbadd123f1b8515f7f5c76",
+    "build_motion_test.py": "8ebb0016b8ee31c1e7e00388cc9a51f85fd7dcdf2c73531a56516c6ae683b3aa",
+    "render_variants.py": "a7574babea6ee29b5b9d338475703cf3ac255b6294838f68444d3814e540f29e"
+  }
+}
