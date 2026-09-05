@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>
+{{FONTS_CSS}}
+html,body{margin:0;background:#121B37;}
+#stage{transform-origin:0 0;}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>window.DATA_STORY_SCENE = {{SCENE_JSON}};</script>
+<script>
+{{ENGINE_JS}}
+</script>
+<script>
+(function(){
+  // Master clock. ?t=<seconds> renders one static frame (used for stills / QA); otherwise autoplay loops.
+  const q = new URLSearchParams(location.search);
+  const scene = window.DATA_STORY_SCENE;
+  const opts = { source_px: q.has('source_px') ? +q.get('source_px') : (scene.render_options?.source_px ?? 30),
+                 static_cover: q.has('static_cover') ? q.get('static_cover') === '1' : !!scene.render_options?.static_cover };
+  window.__frameReady = false;
+  document.fonts.load('700 100px "DataStory DejaVu"').then(() => document.fonts.load('400 100px "DataStory DejaVu"')).then(() => {
+    const player = window.DataStoryEngine.mount(document.getElementById('stage'), scene, opts);
+    window.dataStory = player;
+    if (q.has('t')) { player.render(+q.get('t')); window.__frameReady = true; return; }
+    const t0 = performance.now();
+    (function loop(){ const t = ((performance.now() - t0) / 1000) % player.duration; player.render(t); window.__frameReady = true; requestAnimationFrame(loop); })();
+  });
+})();
+</script>
+</body>
+</html>

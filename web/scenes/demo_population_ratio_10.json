@@ -1,0 +1,20 @@
+{
+  "id": "S05",
+  "template_id": "population_ratio_10",
+  "mode": "demo",
+  "duration_ms": 8000,
+  "copy": {
+    "title_line_1": "7 ΣΤΟΥΣ 10",
+    "title_line_2": "ΠΟΛΙΤΕΣ",
+    "subtitle": "ΑΝΑΛΟΓΙΑ ΠΛΗΘΥΣΜΟΥ",
+    "hero_final": "70%",
+    "hero_label": "ΕΛΛΑΔΑ",
+    "hero_sub": "7 ΑΠΟ ΚΑΘΕ 10",
+    "legend_selected": "7 ΣΤΟΥΣ 10",
+    "legend_rest": "3 ΣΤΟΥΣ 10",
+    "legend_note": "ΚΑΘΕ ΦΙΓΟΥΡΑ ΑΝΤΙΣΤΟΙΧΕΙ ΣΕ 10%"
+  },
+  "inputs": { "fact_id": "DEMO", "total_units": 10, "selected_units": 7, "country_code": "GR" },
+  "source_footer": "ΠΗΓΗ: — · ΔΟΚΙΜΑΣΤΙΚΑ ΣΤΟΙΧΕΙΑ",
+  "render_options": { "source_px": 23, "static_cover": false }
+}

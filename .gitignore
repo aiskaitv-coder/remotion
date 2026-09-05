@@ -13,3 +13,7 @@ __pycache__/
 
 # Node (for a future web port)
 node_modules/
+
+# Web port: local Playwright link and built/QA outputs (rebuild with web/tools/build.mjs)
+web/node_modules/
+web/dist/
