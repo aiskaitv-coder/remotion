@@ -12,6 +12,7 @@ const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, de
 page.on('pageerror', e => { console.error('PAGE ERROR', e.message); });
 page.on('console', m => { if (m.type() === 'error') console.error('CONSOLE', m.text()); });
 await page.goto('file://' + path.resolve(file) + `?t=${t}${extra}`);
-await page.waitForFunction(() => window.__frameReady === true, null, { timeout: 120000 });
+await page.waitForFunction(() => window.__frameReady === true || window.__pageError, null, { timeout: 120000 });
+const pageError = await page.evaluate(() => window.__pageError); if (pageError) { console.error('PAGE ERROR:', pageError); await browser.close(); process.exit(2); }
 const cdp = await page.context().newCDPSession(page); fs.writeFileSync(out, await fastPng(page, cdp));
 await browser.close(); console.log('saved', out);

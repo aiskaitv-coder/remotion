@@ -23,7 +23,9 @@ html,body{margin:0;background:#121B37;}
   const opts = { source_px: q.has('source_px') ? +q.get('source_px') : (scene.render_options?.source_px ?? 30),
                  static_cover: q.has("static_cover") ? q.get("static_cover") === "1" : !!scene.render_options?.static_cover,
                  cover_hold_ms: scene.render_options?.cover_hold_ms ?? 0 };
-  window.__frameReady = false;
+  window.__frameReady = false; window.__pageError = null;
+  window.addEventListener('unhandledrejection', e => { window.__pageError = String(e.reason && (e.reason.message || e.reason)); });
+  window.addEventListener('error', e => { window.__pageError = String(e.message); });
   document.fonts.load('700 100px "DataStory DejaVu"').then(() => document.fonts.load('400 100px "DataStory DejaVu"')).then(() => {
     const player = window.DataStoryEngine.mount(document.getElementById('stage'), scene, opts);
     window.dataStory = player;

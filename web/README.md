@@ -51,6 +51,8 @@ story επιπλέον `start_ms, static_cover, cover_hold_ms, transition{type, 
 | template_id | inputs |
 |---|---|
 | population_ratio_10 | `total_units=10, selected_units, country_code` |
+
+Κοινά προαιρετικά πεδία inputs (engine 1.1): `value_decimals` 0–2 (δεκαδικό κόμμα στην οθόνη, τελείες χιλιάδων αυτόματα), `delta_suffix`, `delta_decimals`, `delta_kind: "relative"` για σχετική μεταβολή σε %. `country_code: null` = μπάρα χωρίς σημαία. Σημαίες: DE FR IT GR EU ES FI CZ PL PT.
 | before_after_columns | `from{time_label,value}, to{time_label,value}, delta_value, value_suffix, value_scale` |
 | stacked_100 | `groups[2]{label, country_code, share}` |
 | donut_parts | `parts[]{label, share, material_id, label_color}, highlighted_index` |

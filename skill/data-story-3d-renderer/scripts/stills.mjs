@@ -11,7 +11,8 @@ const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=sw
 const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
 page.on('pageerror', e => console.error('PAGE ERROR', e.message));
 await page.goto('file://' + path.resolve(file) + '?t=0');
-await page.waitForFunction(() => window.__frameReady === true, null, { timeout: 120000 });
+await page.waitForFunction(() => window.__frameReady === true || window.__pageError, null, { timeout: 120000 });
+const pageError = await page.evaluate(() => window.__pageError); if (pageError) { console.error('PAGE ERROR:', pageError); await browser.close(); process.exit(2); }
 const cdp = await page.context().newCDPSession(page);
 for (const t of list.split(',').map(Number)) {
   await page.evaluate(t => window.dataStory.render(t), t);

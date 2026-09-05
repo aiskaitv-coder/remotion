@@ -26,7 +26,9 @@ html,body{margin:0;background:#121B37;}
   const prod = window.DATA_STORY_PRODUCTION;
   const scenes = prod.scenes;
   const total = (prod.total_duration_ms ?? scenes.reduce((m, s) => Math.max(m, s.start_ms + s.duration_ms), 0)) / 1000;
-  window.__frameReady = false;
+  window.__frameReady = false; window.__pageError = null;
+  window.addEventListener('unhandledrejection', e => { window.__pageError = String(e.reason && (e.reason.message || e.reason)); });
+  window.addEventListener('error', e => { window.__pageError = String(e.message); });
   document.fonts.load('700 100px "DataStory DejaVu"').then(() => document.fonts.load('400 100px "DataStory DejaVu"')).then(() => {
     const stage = document.getElementById('stage');
     // Handoff model (true crossfade, no blank frame): the outgoing scene keeps its final frame for the

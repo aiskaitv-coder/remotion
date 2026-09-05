@@ -278,6 +278,12 @@
     else if (code === 'FR' || code === 'IT') (code === 'FR' ? ['#2359bb','#fff','#e73347'] : ['#22a269','#fff','#e73347']).forEach((c, j) => R(cx-22+j*15, cy-14, cx-8+j*15, cy+13, c));
     else if (code === 'GR') { R(cx-22, cy-14, cx+22, cy+13, '#fff'); for (let j = 0; j < 9; j += 2) R(cx-22, cy-14+j*3, cx+22, cy-12+j*3, '#2469d7');
       R(cx-22, cy-14, cx-8, cy, '#2469d7'); R(cx-16, cy-14, cx-14, cy, '#fff'); R(cx-22, cy-8, cx-8, cy-6, '#fff'); }
+    else if (code === 'ES') { R(cx-22, cy-14, cx+22, cy-8, '#c60b1e'); R(cx-22, cy-7, cx+22, cy+6, '#ffc400'); R(cx-22, cy+7, cx+22, cy+13, '#c60b1e'); }
+    else if (code === 'FI') { R(cx-22, cy-14, cx+22, cy+13, '#fff'); R(cx-22, cy-4, cx+22, cy+3, '#1a4fb0'); R(cx-10, cy-14, cx-3, cy+13, '#1a4fb0'); }
+    else if (code === 'PL') { R(cx-22, cy-14, cx+22, cy-1, '#fff'); R(cx-22, cy, cx+22, cy+13, '#dc143c'); }
+    else if (code === 'PT') { R(cx-22, cy-14, cx-6, cy+13, '#006600'); R(cx-5, cy-14, cx+22, cy+13, '#ff0000'); }
+    else if (code === 'CZ') { R(cx-22, cy-14, cx+22, cy-1, '#fff'); R(cx-22, cy, cx+22, cy+13, '#d7141a');
+      const p = document.createElementNS(svg.namespaceURI, 'polygon'); p.setAttribute('points', `${cx-22},${cy-14} ${cx},${cy} ${cx-22},${cy+14}`); p.setAttribute('fill', '#11457e'); svg.appendChild(p); }
     else { R(cx-22, cy-14, cx+22, cy+14, '#1745b5'); for (let j = 0; j < 12; j++) { const a = j*Math.PI/6, x = cx+9*Math.sin(a), y = cy-9*Math.cos(a);
         const c = document.createElementNS(svg.namespaceURI, 'circle'); c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 1.3); c.setAttribute('fill', '#ffe252'); svg.appendChild(c); } }
     parent.appendChild(svg);
@@ -302,7 +308,7 @@
     const px = opts.source_px, gap = Math.round(px * 34 / 23), words = scene.source_footer.split(/\s+/), lines = []; let line = '';
     for (const w of words) { const trial = (line + ' ' + w).trim(); if (textWidth(trial, px, false) > 910) { lines.push(line); line = w; } else line = trial; }
     lines.push(line);
-    if (lines.length > 2) throw new Error('Source footer exceeds two lines; shorten the attribution.');
+    if (lines.length > 2) throw new Error(`Source footer exceeds two lines at ${px}px in scene ${scene.id}; shorten the attribution: ${scene.source_footer}`);
     lines.forEach((l, i) => txt(h, 83, 1804 + i * gap, l, px, '#afbbd3', false));
     return { layer: h, hero };
   }
@@ -322,7 +328,14 @@
     if (horizontal) parent.appendChild(el('div', { position:'absolute', left: Math.min(x0,x1)+'px', top: (Math.min(y0,y1) - width/2)+'px', width: Math.abs(x1-x0)+'px', height: width+'px', background: color }));
     else parent.appendChild(el('div', { position:'absolute', left: (Math.min(x0,x1) - width/2)+'px', top: Math.min(y0,y1)+'px', width: width+'px', height: Math.abs(y1-y0)+'px', background: color }));
   }
-  const fmt = (v, suffix = '') => String(Math.round(v)) + suffix;
+  // Greek numeric display: decimal comma, dots as thousands separators. Decimals come from the scene inputs
+  // (value_decimals, default 0) so the counter and the final label always share one format.
+  function fmtNum(v, decimals = 0) {
+    const fixed = Math.abs(v).toFixed(decimals); const [int, frac] = fixed.split('.');
+    const grouped = int.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return (v < 0 ? '−' : '') + grouped + (frac ? ',' + frac : '');
+  }
+  const fmt = (v, suffix = '', decimals = 0) => fmtNum(v, decimals) + suffix;
 
   // Template-specific annotations. Each returns update(t, hero, opts) to animate label layers and the KPI counter.
   const ANNOTATIONS = {
@@ -346,7 +359,8 @@
       let acc = 0;
       inp.parts.forEach((p, i) => {
         const l = layer(parent), x = 84 + (i % 2) * 475, y = 1506 + Math.floor(i / 2) * 111;
-        rect(l, x, y + 9, x + 12, y + 38, p.label_color, 4); txt(l, x + 30, y, p.label, 27); txt(l, x + 30, y + 39, p.share + '%', 39, p.label_color);
+        const dec = inp.value_decimals ?? 0;
+        rect(l, x, y + 9, x + 12, y + 38, p.label_color, 4); txt(l, x + 30, y, p.label, 27); txt(l, x + 30, y + 39, fmt(p.share, '%', dec), 39, p.label_color);
         items.push({ layer: l, start: acc, share: p.share / 100 }); acc += p.share / 100;
       });
       const hi = items[inp.highlighted_index], hiShare = inp.parts[inp.highlighted_index].share;
@@ -354,15 +368,15 @@
         const p = ease((t - 0.9) / 3.6);
         items.forEach(it => fadeLayer(it.layer, clamp01((p - it.start) * 8)));
         // The highlighted share counts up while its own arc is being drawn.
-        hero.textContent = opts.static_cover ? c.hero_final : fmt(hiShare * clamp01((p - hi.start) / hi.share)) + '%';
+        hero.textContent = opts.static_cover ? c.hero_final : fmt(hiShare * clamp01((p - hi.start) / hi.share), '%', inp.value_decimals ?? 0);
       };
     },
     line_single(parent, scene) {
-      const inp = scene.inputs, c = scene.copy, obs = inp.observations, n = obs.length, xs = lineX(obs), sc = inp.value_scale ?? 0.064, sfx = inp.value_suffix ?? '';
+      const inp = scene.inputs, c = scene.copy, obs = inp.observations, n = obs.length, xs = lineX(obs), sc = inp.value_scale ?? 0.064, sfx = inp.value_suffix ?? '', dec = inp.value_decimals ?? 0;
       const grid = layer(parent);
       (inp.gridlines ?? []).forEach(v => { const a = project(1, [-3.45, v * sc, 0]), b = project(1, [3.45, v * sc, 0]); line(grid, a[0], a[1], b[0], b[1], 'rgba(134,152,195,0.255)', 1); });
       const nodes = obs.map((o, i) => { const l = layer(parent); const [x, y] = project(1, [xs[i], o.value * sc, 0]);
-        txt(l, x, y - 84, fmt(o.value, sfx), 43, i === n - 1 ? '#ff6386' : '#f6f7ff', true, true);
+        txt(l, x, y - 84, fmt(o.value, sfx, dec), 43, i === n - 1 ? '#ff6386' : '#f6f7ff', true, true);
         // Value appears when the tube actually reaches its point (inverse of the cubic ease over the 4 segments).
         return { layer: l, arrival: i < n - 1 ? 0.9 + 3.6 * (1 - Math.pow(1 - i / (n - 1), 1 / 3)) : 4.5 }; });
       const years = obs.map((o, i) => { const l = layer(parent); const [bx, by] = project(1, [xs[i], 0, 0]);
@@ -374,38 +388,38 @@
         nodes.forEach(nd => fadeLayer(nd.layer, ease((t - nd.arrival) / 0.35)));
         years.forEach((l, i) => fadeLayer(l, ease((t - 0.4 - i * 0.06) / 0.4)));
         fadeLayer(summary, ease((t - 4.5) / 0.5));
-        hero.textContent = opts.static_cover ? c.hero_final : (inp.delta_value >= 0 ? '+' : '−') + fmt(Math.abs(inp.delta_value) * p);
+        hero.textContent = opts.static_cover ? c.hero_final : (inp.delta_value >= 0 ? '+' : '−') + fmt(Math.abs(inp.delta_value) * p, inp.delta_suffix ?? '', dec);
       };
     },
     ranking_horizontal(parent, scene) {
-      const inp = scene.inputs, c = scene.copy, sc = inp.value_scale ?? 0.080, sfx = inp.value_suffix ?? '';
+      const inp = scene.inputs, c = scene.copy, sc = inp.value_scale ?? 0.080, sfx = inp.value_suffix ?? '', dec = inp.value_decimals ?? 0;
       const items = inp.bars.map((b, i) => { const l = layer(parent); const [, cy] = project(2, [-3.75, 5.25 - i * 1.42, 0]);
-        txt(l, 163, cy - 94, b.label, 33); flag(l, b.country_code, 124, cy - 75);
+        if (b.country_code) { txt(l, 163, cy - 94, b.label, 33); flag(l, b.country_code, 124, cy - 75); } else txt(l, 102, cy - 94, b.label, 33);
         const val = txt(l, 0, 0, '', 44, i === inp.highlighted_index ? '#ff6386' : '#f6f7ff'); return { layer: l, val, b, i }; });
       const end = layer(parent); txt(end, 85, 1668, c.end_note, 27, '#a7b3cf', false);
       return (t, hero, opts) => {
         items.forEach(({ layer: l, val, b, i }) => { const bp = ease((t - 0.9 - i * 0.28) / 2.5);
           const [ex, ey] = project(2, [-3.75 + b.value * sc * bp, 5.25 - i * 1.42, 0]);
           // Counter rides the bar tip; label anchor moves with the geometry, never overshoots.
-          val.style.left = (ex + 29) + 'px'; val.style.top = (ey - 30) + 'px'; val.textContent = bp > 0 ? fmt(b.value * bp, sfx) : '';
+          val.style.left = (ex + 29) + 'px'; val.style.top = (ey - 30) + 'px'; val.textContent = bp > 0 ? fmt(b.value * bp, sfx, dec) : '';
           fadeLayer(l, ease((t - 0.5 - i * 0.28) / 0.4)); });
         fadeLayer(end, ease((t - 4.3) / 0.5));
         hero.textContent = c.hero_final;
       };
     },
     before_after_columns(parent, scene) {
-      const inp = scene.inputs, c = scene.copy, sc = inp.value_scale ?? 0.075, sfx = inp.value_suffix ?? '';
+      const inp = scene.inputs, c = scene.copy, sc = inp.value_scale ?? 0.075, sfx = inp.value_suffix ?? '', dec = inp.value_decimals ?? 0;
       const base = layer(parent); const a = project(4, [-3.15, 0, 0]), b = project(4, [3.15, 0, 0]); line(base, a[0], a[1], b[0], b[1], '#617596', 2);
       const cols = [inp.from, inp.to].map((o, i) => { const l = layer(parent); const x = i === 0 ? -1.9 : 1.9; const [lx] = project(4, [x, 0, 0]);
         const val = txt(l, 0, 0, '', 70); txt(l, lx, 1544, o.time_label, 55, '#f6f7ff', true, true);
         txt(l, lx, 1625, i === 0 ? c.from_caption : c.to_caption, 32, '#b1bed7', true, true); return { layer: l, val, o, x, i }; });
       return (t, hero, opts) => {
         cols.forEach(({ layer: l, val, o, x, i }) => { const bp = ease((t - 0.9 - i * 0.55) / 2.2);
-          const [px, py] = project(4, [x, o.value * sc * bp, 0]); const s = bp > 0.001 ? fmt(o.value * bp, sfx) : '';
+          const [px, py] = project(4, [x, o.value * sc * bp, 0]); const s = bp > 0.001 ? fmt(o.value * bp, sfx, dec) : '';
           val.textContent = s; val.style.left = (px - textWidth(s, 70, true) / 2) + 'px'; val.style.top = (py - 125) + 'px';
           fadeLayer(l, ease((t - 0.45 - i * 0.2) / 0.45)); });
         const d = inp.delta_value;
-        hero.textContent = opts.static_cover ? c.hero_final : (d >= 0 ? '+' : '−') + fmt(Math.abs(d) * ease((t - 3.65) / 0.8));
+        hero.textContent = opts.static_cover ? c.hero_final : (d >= 0 ? '+' : '−') + fmt(Math.abs(d) * ease((t - 3.65) / 0.8), inp.delta_suffix ?? '', inp.delta_decimals ?? dec);
       };
     },
     stacked_100(parent, scene) {
@@ -414,8 +428,9 @@
         const head = layer(parent); flag(head, g.country_code, 139, cy - 109); txt(head, 184, cy - 133, g.label, 36);
         const labels = layer(parent); const s = g.share / 100;
         const [sx, sy] = project(5, [-3.5 + 7 * s / 2, y, 0]), [nx, ny] = project(5, [-3.5 + 7 * s + 7 * (1 - s) / 2, y, 0]);
-        txt(labels, sx, sy - 26, c.part_label_yes + ' ' + g.share + '%', 32, '#101b3b', true, true);
-        txt(labels, nx, ny - 26, c.part_label_no + ' ' + (100 - g.share) + '%', 32, '#101b3b', true, true);
+        const dec = inp.value_decimals ?? 0;
+        txt(labels, sx, sy - 26, c.part_label_yes + ' ' + fmt(g.share, '%', dec), 32, '#101b3b', true, true);
+        txt(labels, nx, ny - 26, c.part_label_no + ' ' + fmt(100 - g.share, '%', dec), 32, '#101b3b', true, true);
         return { head, labels, row }; });
       const end = layer(parent); txt(end, 85, 1575, c.end_title, 43); txt(end, 85, 1668, c.end_note, 30, '#b1bed7', false);
       return (t, hero) => {
