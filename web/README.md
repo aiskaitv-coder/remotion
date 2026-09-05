@@ -15,6 +15,7 @@ Single-file HTML εκδοχή του εγκεκριμένου 3D renderer, γι�
 | `scenes/demo_*.json` | Οι έξι demo σκηνές (fictional τιμές) με τη μορφή template inputs. |
 | `stories/demo_reel.json` | Production JSON 6 σκηνών × 8 s, για δοκιμή του player. |
 | `tools/build.mjs` | Bundler → `dist/<name>.html`. |
+| `src/stage.template.html`, `src/stage-runtime/` | **Κύριο παραδοτέο**: Stage-based HTML κατά το Claude2Video Stage Export Format. Το runtime (React 18 + Stage/useTime + timeline component) είναι προ-bundled (`stage-runtime.bundle.js`, esbuild, χωρίς minify) ώστε ο builder να είναι απλή αντικατάσταση. `node tools/build.mjs --stage-html <production.json>`. |
 | `tools/build_stage.mjs`, `src/stage.template.jsx` | Stage-based React component (JSX) για Claude Design: `<Stage duration fps autoPlay>` + `useTime()` → `engine.mountStory().render(t)`. Επαληθεύτηκε με shim harness (`test/stage/`): καρέ μέσω `__seek` ταυτόσημα με τα stills. |
 | `tools/screenshot.mjs`, `tools/stills.mjs` | Chromium capture ενός ή πολλών timestamps (1080×1920). |
 | `tools/render_mp4.mjs` | Frame-by-frame render σε MP4 (25 fps, libx264, yuv420p). |
@@ -31,7 +32,8 @@ ln -sfn /opt/node22/lib/node_modules/playwright node_modules/playwright   # ή n
 node tools/build.mjs scenes/demo_population_ratio_10.json
 node tools/screenshot.mjs dist/demo_population_ratio_10.html 6 out.png "&static_cover=1&source_px=30"
 
-# 2. Ολόκληρο story → HTML → review package → MP4
+# 2. Ολόκληρο story → Stage HTML (για claude2video.com) + review package; MP4 προαιρετικά τοπικά
+node tools/build.mjs --stage-html stories/demo_reel.json     # → dist/demo_reel.stage.html, το παραδοτέο
 node tools/build.mjs --story stories/demo_reel.json
 python3 tools/review.py stories/demo_reel.json dist/demo_reel.html dist/review_demo_reel
 node tools/render_mp4.mjs dist/demo_reel.html dist/demo_reel.mp4
@@ -81,3 +83,14 @@ rasterizer κειμένου (Pillow vs Chromium). Δείτε `docs/RUNTIME_STATU
 - Το headless render στο repo χρησιμοποιεί SwiftShader (CPU): ≈4,7 s ανά καρέ 1080×1920 στη
   βαρύτερη σκηνή (10 φιγούρες), δηλαδή ≈1,5 ώρα για 48 s βίντεο σε 4 cores. Τα stills και το
   review package είναι γρήγορα (7 καρέ σε 45 s). Σε GPU browser η κίνηση παίζει σε πραγματικό χρόνο.
+
+## Ανανέωση του runtime bundle
+
+```sh
+cd web && npm install --no-save esbuild react@18 react-dom@18 && ln -sfn /opt/node22/lib/node_modules/playwright node_modules/playwright
+./node_modules/.bin/esbuild src/stage-runtime/entry.jsx --bundle --outfile=src/stage-runtime/stage-runtime.bundle.js \
+  --loader:.jsx=jsx --jsx=automatic --define:process.env.NODE_ENV='"production"'
+node test/stage/verify_contract.mjs dist/<story>.stage.html   # fiber walk, hook layout, seek, frame compare
+```
+
+Χωρίς minification: ο exporter βρίσκει το Stage από το `type.name`. Μετά την ανανέωση, νέα SHA256 στο skill.

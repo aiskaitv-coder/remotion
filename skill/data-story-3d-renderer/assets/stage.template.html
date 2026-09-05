@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>
+{{FONTS_CSS}}
+html,body{margin:0;height:100%;background:#121B37;}
+#root{position:fixed;inset:0;overflow:hidden;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>window.DATA_STORY_PRODUCTION = {{PRODUCTION_JSON}};</script>
+<script>
+{{ENGINE_JS}}
+</script>
+<script>
+{{STAGE_RUNTIME_JS}}
+</script>
+</body>
+</html>

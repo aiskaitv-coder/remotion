@@ -1,6 +1,6 @@
 ---
 name: data-story-3d-renderer
-description: Renders DATA STORY Reels/Shorts (1080×1920, 25 fps) in the locked DATA_STORY_3D_BRIGHT_V1 graphics system from a production JSON, producing a self-contained HTML timeline that plays in the browser or Claude Design and exports to MP4. Use it whenever a user asks to build, render, preview, export or hand off a DATA STORY video, a "3D bright" data chart scene, a population_ratio_10 / before_after_columns / stacked_100 / donut_parts / line_single / ranking_horizontal scene, a cover still, a contact sheet or a review package, or when a Production Document / production JSON exists and needs to become video. The graphics are frozen assets, never redrawn — this skill only fills data.
+description: Renders DATA STORY Reels/Shorts (1080×1920, 25 fps) in the locked DATA_STORY_3D_BRIGHT_V1 graphics system from a production JSON, producing ONE self-contained Stage-based HTML (Claude2Video Stage Export Format) that the user uploads to claude2video.com to get the MP4. Use it whenever a user asks to build, render, preview, export or hand off a DATA STORY video, a "3D bright" data chart scene, a population_ratio_10 / before_after_columns / stacked_100 / donut_parts / line_single / ranking_horizontal scene, a cover still, a contact sheet or a review package, or when a Production Document / production JSON exists and needs to become video. The graphics are frozen assets, never redrawn — this skill only fills data.
 ---
 
 # DATA STORY 3D renderer (locked design, data-only workflow)
@@ -29,24 +29,26 @@ If a story needs something the six templates cannot express, say so and stop.
    Fix every reported line. It checks supported templates, donut sums, integer tenths for the
    ten-figure ratio, descending rankings, contiguous timeline at 40 ms boundaries, cover hold,
    transitions in the 280–450 ms band and real source footers. It cannot verify facts.
-3. **Build the timeline page:**
-   `python3 scripts/build.py --story story.json DATA_STORY_<topic>.html`
-   One self-contained file (~80 KB): fonts, engine and data inline, no network. It autoplays
-   and loops; `?t=<seconds>` shows one exact frame; `window.dataStory.render(t)` drives it
-   from an external timeline. Scene 1 is a complete static cover at frame 0 for `cover_hold_ms`.
-   If you cannot execute Python, do the same substitution by hand: paste `fonts.css` at
-   `{{FONTS_CSS}}`, `engine.js` at `{{ENGINE_JS}}`, the JSON at `{{PRODUCTION_JSON}}` and a
-   title at `{{TITLE}}` in `assets/story.template.html`, changing nothing else.
-4. **Hand off.** Deliver the HTML with the scene table (id, template, start, duration,
-   transition). For Claude Design's Stage-based (exportable) projects build the React component
-   instead: `python3 scripts/build.py --stage story.json DATA_STORY_<topic>.stage.jsx`. It wraps
-   the same locked engine in `<Stage width={1080} height={1920} duration={…} fps={25} autoPlay>`
-   and renders every frame from `useTime()` (seconds), so the exporter can seek any frame; the
-   only project-specific line is `import { Stage, useTime } from "./animations.jsx"` — point it
-   at the project's Stage starter if it lives elsewhere. Do not add CSS animations, timers or
-   randomness around it: exportability depends on every pixel being a function of the time value. In Claude Code, `scripts/render_mp4.mjs` and
-   `scripts/review.py` produce the MP4 and the visual-review package (cover PNG, one settled
-   frame per scene, numbered contact sheet) from the same file — see `references/qa-checklist.md`.
+3. **Build the deliverable, a Stage-based HTML:**
+   `python3 scripts/build.py --stage-html story.json DATA_STORY_<topic>.stage.html`
+   One self-contained file (~370 KB): fonts, production JSON, the locked engine and a pre-bundled React 18
+   runtime with `<Stage>`/`useTime()` inline, no network. It implements the Claude2Video Stage Export
+   Format exactly (`references/claude2video-contract.md`): `window.Stage`/`window.useTime` before the
+   `#root` mount, one `<Stage width height duration>` whose first two `useState` are `time` then
+   `playing`, a canvas div with `transform: scale(1)`, and every pixel a function of `useTime()`.
+   It autoplays in any browser with no interaction; the exporter pauses it and seeks frame by frame.
+   The builder is pure Python and refuses to run if a locked asset changed.
+   If you cannot execute Python, do the same substitution by hand in `assets/stage.template.html`:
+   `{{FONTS_CSS}}` ← fonts.css, `{{PRODUCTION_JSON}}` ← the JSON, `{{ENGINE_JS}}` ← engine.js,
+   `{{STAGE_RUNTIME_JS}}` ← stage-runtime/stage-runtime.bundle.js, `{{TITLE}}` ← a title. Nothing else.
+4. **Hand off.** Deliver the `.stage.html` with the scene table (id, template, start, duration,
+   transition) and tell the user: upload it to https://claude2video.com/ to render and download
+   the MP4 (choose 25 fps so scene boundaries fall on frames). Do not produce an MP4 yourself
+   unless the user asks for a local render; the page IS the export-ready timeline.
+   Variants when asked: `--story` gives the plain autoplay page (`?t=<s>` scrubs a frame);
+   `--stage <name>` gives the JSX component for a Claude Design project that has its own
+   `animations.jsx`. In Claude Code, `scripts/review.py` produces the visual-review package
+   (cover PNG, one settled frame per scene, numbered contact sheet) from the `--story` page.
 
 Editorial approval unlocks production; the visual-review stills must still be approved before
 a video is treated as final. Never state that a render ran when it did not.
@@ -85,10 +87,10 @@ steel automatically. Label colors for donut legends are the screen accents liste
 
 ## Files
 
-- `assets/` — locked engine, fonts, templates, demo JSON (hashes in `references/LOCKED_SHA256.txt`)
-- `scripts/build.py`, `scripts/validate_production.py` — dependency-free; use these first
-- `scripts/render_mp4.mjs`, `scripts/stills.mjs`, `scripts/review.py`, `scripts/compare.py` — Claude Code / Node + Playwright + FFmpeg only
-- `scripts/build_stage_html.sh` — when an exporter accepts only .html/.zip: bundles React 18 + `assets/stage-runtime/animations.jsx` (Stage/useTime, `window.__seek`, `window.__videoMeta`, `?__render=1`) + the Stage JSX into ONE html (needs Node, esbuild, react, react-dom in `web/`)
+- `assets/` — locked engine, fonts, templates (page, story, stage HTML, stage JSX), runtime bundle, demo JSON (hashes in `references/LOCKED_SHA256.txt`)
+- `scripts/build.py` (`--stage-html` default, `--story`, `--stage`), `scripts/validate_production.py` — dependency-free; use these first
+- `scripts/render_mp4.mjs`, `scripts/stills.mjs`, `scripts/review.py`, `scripts/compare.py` — optional local render/review, Claude Code only (Node + Playwright + FFmpeg)
+- `assets/stage-runtime/` — `animations.jsx` (Stage/useTime source) and `stage-runtime.bundle.js` (React 18 + runtime + timeline component, pre-bundled, locked)
 - `references/production-json.md` — every field, per template, with an example
 - `references/locked-design.md` — what is frozen and why, tokens for the record
 - `references/qa-checklist.md` — PASS/FAIL/NOT_RUN checklist for specification and render
