@@ -1,0 +1,15 @@
+{
+  "id": "S04", "template_id": "ranking_horizontal", "mode": "demo", "duration_ms": 8000,
+  "copy": { "title_line_1": "ΠΟΙΟΣ ΕΙΝΑΙ", "title_line_2": "ΜΠΡΟΣΤΑ", "subtitle": "ΣΥΓΚΡΙΣΗ ΤΕΣΣΑΡΩΝ ΧΩΡΩΝ",
+            "hero_final": "4", "hero_label": "ΧΩΡΕΣ", "hero_sub": "ΜΙΑ ΚΟΙΝΗ ΚΛΙΜΑΚΑ", "end_note": "ΤΑΞΙΝΟΜΗΣΗ ΑΠΟ ΤΟ ΥΨΗΛΟΤΕΡΟ" },
+  "inputs": {
+    "bars": [
+      { "fact_id": "DEMO_DE", "label": "ΓΕΡΜΑΝΙΑ", "country_code": "DE", "value": 82, "material_id": 0 },
+      { "fact_id": "DEMO_FR", "label": "ΓΑΛΛΙΑ",   "country_code": "FR", "value": 71, "material_id": 2 },
+      { "fact_id": "DEMO_IT", "label": "ΙΤΑΛΙΑ",   "country_code": "IT", "value": 64, "material_id": 3 },
+      { "fact_id": "DEMO_GR", "label": "ΕΛΛΑΔΑ",   "country_code": "GR", "value": 48, "material_id": 1 }
+    ],
+    "highlighted_index": 3, "value_suffix": "%", "value_scale": 0.080
+  },
+  "source_footer": "ΠΗΓΗ: — · ΔΟΚΙΜΑΣΤΙΚΑ ΣΤΟΙΧΕΙΑ", "render_options": { "source_px": 23 }
+}

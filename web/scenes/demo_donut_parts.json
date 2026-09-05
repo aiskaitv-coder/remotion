@@ -1,0 +1,15 @@
+{
+  "id": "S02", "template_id": "donut_parts", "mode": "demo", "duration_ms": 8000,
+  "copy": { "title_line_1": "ΠΟΥ ΠΑΝΕ", "title_line_2": "ΤΑ ΧΡΗΜΑΤΑ", "subtitle": "ΚΑΤΑΝΟΜΗ ΔΑΠΑΝΩΝ",
+            "hero_final": "38%", "hero_label": "ΣΤΕΓΑΣΗ", "hero_sub": "ΤΟ ΜΕΓΑΛΥΤΕΡΟ ΜΕΡΙΔΙΟ" },
+  "inputs": {
+    "parts": [
+      { "fact_id": "DEMO_A", "label": "ΣΤΕΓΑΣΗ",   "share": 38, "material_id": 1, "label_color": "#ff315c" },
+      { "fact_id": "DEMO_B", "label": "ΤΡΟΦΙΜΑ",   "share": 24, "material_id": 0, "label_color": "#7895ff" },
+      { "fact_id": "DEMO_C", "label": "ΜΕΤΑΦΟΡΕΣ", "share": 18, "material_id": 2, "label_color": "#b486ff" },
+      { "fact_id": "DEMO_D", "label": "ΑΛΛΑ",      "share": 20, "material_id": 3, "label_color": "#95b0d4" }
+    ],
+    "highlighted_index": 0
+  },
+  "source_footer": "ΠΗΓΗ: — · ΔΟΚΙΜΑΣΤΙΚΑ ΣΤΟΙΧΕΙΑ", "render_options": { "source_px": 23 }
+}

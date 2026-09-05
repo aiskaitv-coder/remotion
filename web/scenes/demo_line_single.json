@@ -1,0 +1,17 @@
+{
+  "id": "S03", "template_id": "line_single", "mode": "demo", "duration_ms": 8000,
+  "copy": { "title_line_1": "Η ΑΝΟΔΟΣ", "title_line_2": "ΣΕ ΜΙΑ ΓΡΑΜΜΗ", "subtitle": "ΕΞΕΛΙΞΗ 2021–2025",
+            "hero_final": "+32", "hero_label": "ΜΟΝΑΔΕΣ", "hero_sub": "ΑΠΟ ΤΟ 2021 ΣΤΟ 2025",
+            "summary_line": "42%  →  74%", "summary_note": "ΣΤΑΘΕΡΑ ΑΝΟΔΙΚΗ ΠΟΡΕΙΑ" },
+  "inputs": {
+    "observations": [
+      { "fact_id": "DEMO_2021", "time": 2021, "value": 42 },
+      { "fact_id": "DEMO_2022", "time": 2022, "value": 48 },
+      { "fact_id": "DEMO_2023", "time": 2023, "value": 55 },
+      { "fact_id": "DEMO_2024", "time": 2024, "value": 66 },
+      { "fact_id": "DEMO_2025", "time": 2025, "value": 74 }
+    ],
+    "value_suffix": "%", "value_scale": 0.064, "gridlines": [0, 40, 80], "delta_value": 32
+  },
+  "source_footer": "ΠΗΓΗ: — · ΔΟΚΙΜΑΣΤΙΚΑ ΣΤΟΙΧΕΙΑ", "render_options": { "source_px": 23 }
+}

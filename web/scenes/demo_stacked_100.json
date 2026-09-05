@@ -1,0 +1,9 @@
+{
+  "id": "S07", "template_id": "stacked_100", "mode": "demo", "duration_ms": 8000,
+  "copy": { "title_line_1": "ΠΩΣ ΜΟΙΡΑΖΕΤΑΙ", "title_line_2": "ΤΟ ΣΥΝΟΛΟ", "subtitle": "ΣΥΓΚΡΙΣΗ ΚΑΤΑΝΟΜΩΝ",
+            "hero_final": "100%", "hero_label": "ΣΥΝΟΛΟ", "hero_sub": "ΙΔΙΑ ΒΑΣΗ ΣΥΓΚΡΙΣΗΣ",
+            "end_title": "ΚΑΘΕ ΜΠΑΡΑ = 100%", "end_note": "ΣΥΓΚΡΙΝΟΥΜΕ ΤΗΝ ΚΑΤΑΝΟΜΗ", "part_label_yes": "ΝΑΙ", "part_label_no": "ΟΧΙ" },
+  "inputs": { "groups": [ { "fact_id": "DEMO_GR", "label": "ΕΛΛΑΔΑ", "country_code": "GR", "share": 70 },
+                          { "fact_id": "DEMO_EU", "label": "ΕΥΡΩΠΑΪΚΗ ΕΝΩΣΗ", "country_code": "EU", "share": 55 } ] },
+  "source_footer": "ΠΗΓΗ: — · ΔΟΚΙΜΑΣΤΙΚΑ ΣΤΟΙΧΕΙΑ", "render_options": { "source_px": 23 }
+}

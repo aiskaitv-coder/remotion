@@ -1,0 +1,10 @@
+{
+  "id": "S06", "template_id": "before_after_columns", "mode": "demo", "duration_ms": 8000,
+  "copy": { "title_line_1": "ΠΡΙΝ", "title_line_2": "ΚΑΙ ΜΕΤΑ", "subtitle": "ΣΥΓΚΡΙΣΗ ΔΥΟ ΧΡΟΝΙΚΩΝ ΣΗΜΕΙΩΝ",
+            "hero_final": "+25", "hero_label": "ΜΟΝΑΔΕΣ", "hero_sub": "ΜΕΣΑ ΣΕ ΜΙΑ ΔΕΚΑΕΤΙΑ",
+            "from_caption": "ΠΡΙΝ", "to_caption": "ΜΕΤΑ" },
+  "inputs": { "from": { "fact_id": "DEMO_2015", "time_label": "2015", "value": 40 },
+              "to":   { "fact_id": "DEMO_2025", "time_label": "2025", "value": 65 },
+              "delta_value": 25, "value_suffix": "%", "value_scale": 0.075 },
+  "source_footer": "ΠΗΓΗ: — · ΔΟΚΙΜΑΣΤΙΚΑ ΣΤΟΙΧΕΙΑ", "render_options": { "source_px": 23 }
+}

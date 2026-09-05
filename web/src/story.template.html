@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>
+{{FONTS_CSS}}
+html,body{margin:0;background:#121B37;}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#121B37;}
+#stage > .scene{position:absolute;left:0;top:0;}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>window.DATA_STORY_PRODUCTION = {{PRODUCTION_JSON}};</script>
+<script>
+{{ENGINE_JS}}
+</script>
+<script>
+(function(){
+  // Story player: every scene of the production JSON on ONE master clock (seconds).
+  // Scene i is visible for start_ms <= T < start_ms + duration_ms. Handoffs are declared on the
+  // outgoing scene (transition.type 'crossfade' | 'cut', transition.duration_ms) and rendered as a
+  // content fade-out of that scene plus a content fade-in of the next one over a shared background.
+  const q = new URLSearchParams(location.search);
+  const prod = window.DATA_STORY_PRODUCTION;
+  const scenes = prod.scenes;
+  const total = (prod.total_duration_ms ?? scenes.reduce((m, s) => Math.max(m, s.start_ms + s.duration_ms), 0)) / 1000;
+  window.__frameReady = false;
+  document.fonts.load('700 100px "DataStory DejaVu"').then(() => document.fonts.load('400 100px "DataStory DejaVu"')).then(() => {
+    const stage = document.getElementById('stage');
+    const players = scenes.map((sc, i) => {
+      const prev = scenes[i - 1], own = sc.transition ?? { type: 'crossfade', duration_ms: 350 };
+      const fadeIn = prev ? ((prev.transition ?? { type: 'crossfade', duration_ms: 350 }).type === 'cut' ? 0 : (prev.transition?.duration_ms ?? 350)) : 0;
+      const fadeOut = own.type === 'cut' ? 0 : own.duration_ms;
+      const root = document.createElement('div'); root.className = 'scene'; stage.appendChild(root);
+      const player = window.DataStoryEngine.mount(root, sc, {
+        source_px: prod.render_options?.source_px ?? 30,
+        static_cover: !!sc.static_cover, cover_hold_ms: sc.cover_hold_ms ?? 0,
+        fade_in_ms: sc.static_cover ? 0 : fadeIn, fade_out_ms: fadeOut });
+      root.hidden = true; return { sc, player, root };
+    });
+    function render(T) {
+      for (const { sc, player, root } of players) {
+        const local = T - sc.start_ms / 1000, on = local >= 0 && local < sc.duration_ms / 1000;
+        root.hidden = !on; if (on) player.render(local);
+      }
+    }
+    window.dataStory = { render, duration: total, scenes: scenes.map(s => ({ id: s.id, start_ms: s.start_ms, duration_ms: s.duration_ms })) };
+    if (q.has('t')) { render(+q.get('t')); window.__frameReady = true; return; }
+    const t0 = performance.now();
+    (function loop(){ render(((performance.now() - t0) / 1000) % total); window.__frameReady = true; requestAnimationFrame(loop); })();
+  });
+})();
+</script>
+</body>
+</html>
