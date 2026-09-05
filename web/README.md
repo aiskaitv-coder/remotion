@@ -75,5 +75,6 @@ rasterizer κειμένου (Pillow vs Chromium). Δείτε `docs/RUNTIME_STATU
   συνδεθεί με `dataStory.render(t)` ή να αφεθεί το autoplay.
 - Τα έξι planned templates (hero_kpi, waffle_100, line_dual, timeline, diverging_bars,
   waterfall) δεν υλοποιούνται· το `mount()` απορρίπτει άγνωστο template_id.
-- Το headless render στο repo χρησιμοποιεί SwiftShader (CPU). Σε GPU browser η κίνηση
-  παίζει σε πραγματικό χρόνο.
+- Το headless render στο repo χρησιμοποιεί SwiftShader (CPU): ≈4,7 s ανά καρέ 1080×1920 στη
+  βαρύτερη σκηνή (10 φιγούρες), δηλαδή ≈1,5 ώρα για 48 s βίντεο σε 4 cores. Τα stills και το
+  review package είναι γρήγορα (7 καρέ σε 45 s). Σε GPU browser η κίνηση παίζει σε πραγματικό χρόνο.
