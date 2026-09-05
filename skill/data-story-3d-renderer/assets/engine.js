@@ -472,5 +472,42 @@
     return { render, duration, canvas, root };
   }
 
-  window.DataStoryEngine = { mount, ease, KIND };
+
+  // ---------- story player: every scene of a production JSON on ONE master clock (seconds) ----------
+  // Scene i is visible for start_ms <= T < start_ms + duration_ms. Handoffs are declared on the OUTGOING scene
+  // (transition.type 'crossfade' | 'cut', transition.duration_ms). A crossfade keeps the outgoing scene's final
+  // frame for the transition length while the incoming scene fades in ON TOP via stage opacity, so no frame is
+  // ever empty. The last scene's declared transition fades its content out to the shared background.
+  function mountStory(stage, prod, options = {}) {
+    const scenes = prod.scenes;
+    const total = (prod.total_duration_ms ?? scenes.reduce((m, s) => Math.max(m, s.start_ms + s.duration_ms), 0)) / 1000;
+    stage.style.cssText = 'position:relative;width:1080px;height:1920px;overflow:hidden;background:#121B37;' + (options.stage_css || '');
+    const tr = (sc) => sc.transition ?? { type: 'crossfade', duration_ms: 350 };
+    const players = scenes.map((sc, i) => {
+      const prev = scenes[i - 1], last = i === scenes.length - 1;
+      const inMs = prev && tr(prev).type !== 'cut' ? tr(prev).duration_ms : 0;
+      const root = document.createElement('div'); stage.appendChild(root);            // later scenes stack on top
+      const player = mount(root, sc, {
+        source_px: options.source_px ?? prod.render_options?.source_px ?? 30,
+        static_cover: !!sc.static_cover, cover_hold_ms: sc.cover_hold_ms ?? 0,
+        fade_in_ms: 0, fade_out_ms: last && tr(sc).type !== 'cut' ? tr(sc).duration_ms : 0 });
+      root.style.position = 'absolute'; root.style.left = '0'; root.style.top = '0';  // mount() resets cssText; scenes must overlap
+      root.hidden = true; return { sc, player, root, inMs, tailMs: !last && tr(sc).type !== 'cut' ? tr(sc).duration_ms : 0 };
+    });
+    function render(T) {
+      for (const { sc, player, root, inMs, tailMs } of players) {
+        const start = sc.start_ms / 1000, dur = sc.duration_ms / 1000, local = T - start;
+        const on = local >= 0 && local < dur + tailMs / 1000;
+        root.hidden = !on; if (!on) continue;
+        root.style.opacity = inMs > 0 && !sc.static_cover ? ease(local / (inMs / 1000)) : 1;
+        player.render(Math.min(local, dur - 0.001));   // tail holds the final frame under the incoming scene
+      }
+    }
+    return { render, duration: total, scenes: scenes.map(s => ({ id: s.id, start_ms: s.start_ms, duration_ms: s.duration_ms })) };
+  }
+
+  // Fonts must be resolved before the first layout (hero anchors are measured from the final KPI string).
+  function ready() { return document.fonts.load('700 100px "DataStory DejaVu"').then(() => document.fonts.load('400 100px "DataStory DejaVu"')); }
+
+  window.DataStoryEngine = { mount, mountStory, ready, ease, KIND };
 })();

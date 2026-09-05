@@ -38,9 +38,13 @@ If a story needs something the six templates cannot express, say so and stop.
    `{{FONTS_CSS}}`, `engine.js` at `{{ENGINE_JS}}`, the JSON at `{{PRODUCTION_JSON}}` and a
    title at `{{TITLE}}` in `assets/story.template.html`, changing nothing else.
 4. **Hand off.** Deliver the HTML with the scene table (id, template, start, duration,
-   transition). For Claude Design: import the HTML as the component; its own timeline is the
-   production timeline (scenes on one master clock), so no keyframes need to be authored;
-   export video from there. In Claude Code, `scripts/render_mp4.mjs` and
+   transition). For Claude Design's Stage-based (exportable) projects build the React component
+   instead: `python3 scripts/build.py --stage story.json DATA_STORY_<topic>.stage.jsx`. It wraps
+   the same locked engine in `<Stage width={1080} height={1920} duration={…} fps={25} autoPlay>`
+   and renders every frame from `useTime()` (seconds), so the exporter can seek any frame; the
+   only project-specific line is `import { Stage, useTime } from "./animations.jsx"` — point it
+   at the project's Stage starter if it lives elsewhere. Do not add CSS animations, timers or
+   randomness around it: exportability depends on every pixel being a function of the time value. In Claude Code, `scripts/render_mp4.mjs` and
    `scripts/review.py` produce the MP4 and the visual-review package (cover PNG, one settled
    frame per scene, numbered contact sheet) from the same file — see `references/qa-checklist.md`.
 
@@ -84,6 +88,7 @@ steel automatically. Label colors for donut legends are the screen accents liste
 - `assets/` — locked engine, fonts, templates, demo JSON (hashes in `references/LOCKED_SHA256.txt`)
 - `scripts/build.py`, `scripts/validate_production.py` — dependency-free; use these first
 - `scripts/render_mp4.mjs`, `scripts/stills.mjs`, `scripts/review.py`, `scripts/compare.py` — Claude Code / Node + Playwright + FFmpeg only
+- `scripts/build_stage_html.sh` — when an exporter accepts only .html/.zip: bundles React 18 + `assets/stage-runtime/animations.jsx` (Stage/useTime, `window.__seek`, `window.__videoMeta`, `?__render=1`) + the Stage JSX into ONE html (needs Node, esbuild, react, react-dom in `web/`)
 - `references/production-json.md` — every field, per template, with an example
 - `references/locked-design.md` — what is frozen and why, tokens for the record
 - `references/qa-checklist.md` — PASS/FAIL/NOT_RUN checklist for specification and render

@@ -15,6 +15,7 @@ Single-file HTML εκδοχή του εγκεκριμένου 3D renderer, γι�
 | `scenes/demo_*.json` | Οι έξι demo σκηνές (fictional τιμές) με τη μορφή template inputs. |
 | `stories/demo_reel.json` | Production JSON 6 σκηνών × 8 s, για δοκιμή του player. |
 | `tools/build.mjs` | Bundler → `dist/<name>.html`. |
+| `tools/build_stage.mjs`, `src/stage.template.jsx` | Stage-based React component (JSX) για Claude Design: `<Stage duration fps autoPlay>` + `useTime()` → `engine.mountStory().render(t)`. Επαληθεύτηκε με shim harness (`test/stage/`): καρέ μέσω `__seek` ταυτόσημα με τα stills. |
 | `tools/screenshot.mjs`, `tools/stills.mjs` | Chromium capture ενός ή πολλών timestamps (1080×1920). |
 | `tools/render_mp4.mjs` | Frame-by-frame render σε MP4 (25 fps, libx264, yuv420p). |
 | `tools/review.py` | Πακέτο VISUAL REVIEW: cover frame 0, ένα settled frame ανά σκηνή, αριθμημένο contact sheet. |

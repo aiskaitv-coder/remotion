@@ -2,16 +2,39 @@
 """Deterministic builder for DATA_STORY_3D_BRIGHT_V1 pages. No dependencies beyond Python 3.
 
     python3 scripts/build.py --story production.json out.html   # multi-scene story player (timeline)
+    python3 scripts/build.py --stage production.json out.jsx [ComponentName]   # Stage-based React component for Claude Design
     python3 scripts/build.py scene.json out.html                 # one scene
 
 The graphics are NOT generated here. The engine (shader, materials, camera, typography anchors,
 fonts, motion vocabulary) is a locked asset. This script only substitutes the JSON into the
 template and refuses to run if any locked asset differs from references/LOCKED_SHA256.txt,
 so a build can never carry a modified look."""
-import hashlib, json, os, sys
+import hashlib, json, os, re, sys
+from decimal import Decimal
 
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.dirname(HERE)
 ASSETS = os.path.join(ROOT, 'assets'); LOCK = os.path.join(ROOT, 'references', 'LOCKED_SHA256.txt')
+
+def js_json(data):
+    """JSON.stringify-compatible serialization so Python and Node builds are byte-identical:
+    integral floats print without '.0' and small floats never use exponent notation (JS switches to
+    exponents only below 1e-6 or at/above 1e21)."""
+    def norm(x):
+        if isinstance(x, bool) or x is None or isinstance(x, (int, str)): return x
+        if isinstance(x, float):
+            if x != x or x in (float('inf'), float('-inf')): return None
+            if x.is_integer() and abs(x) < 1e21: return int(x)
+            if 1e-6 <= abs(x) < 1e21:
+                d = format(Decimal(repr(x)), 'f'); return _Raw(d.rstrip('0').rstrip('.') if '.' in d else d)
+            return _Raw(repr(x).replace('e-0', 'e-').replace('e+', 'e+'))
+        if isinstance(x, dict): return {k: norm(v) for k, v in x.items()}
+        if isinstance(x, (list, tuple)): return [norm(v) for v in x]
+        return x
+    out = json.dumps(norm(data), ensure_ascii=False, separators=(',', ':'))
+    return re.sub(r'"__RAW__(.*?)__"', lambda m: m.group(1), out)
+class _Raw(str):
+    """Marker for pre-formatted numbers; json.dumps would quote it, so encode via a placeholder."""
+    def __new__(cls, v): return str.__new__(cls, '__RAW__' + v + '__')
 
 def verify_locked():
     expected = dict(line.split()[::-1] for line in open(LOCK) if line.strip())
@@ -23,13 +46,27 @@ def verify_locked():
         sys.exit('LOCKED ASSET MODIFIED — refusing to build. The design system is frozen; restore the '
                  'original files or obtain a new signed release.\n  ' + '\n  '.join(bad))
 
+def build_stage(json_path, out_path, name=None):
+    verify_locked()
+    data = json.load(open(json_path, encoding='utf-8'))
+    name = name or 'DataStory' + ''.join(ch for ch in os.path.basename(json_path).split('.')[0] if ch.isalnum())
+    tpl = open(os.path.join(ASSETS, 'stage.template.jsx'), encoding='utf-8').read()
+    jsx = (tpl.replace('{{TITLE}}', f"DATA STORY · {data.get('topic','story')} · {data['total_duration_ms']/1000}s @ {data['canvas']['fps']} fps", 1)
+              .replace('{{ENGINE_JS}}', open(os.path.join(ASSETS, 'engine.js'), encoding='utf-8').read(), 1)
+              .replace('{{FONTS_CSS_JSON}}', json.dumps(open(os.path.join(ASSETS, 'fonts.css'), encoding='utf-8').read()), 1)
+              .replace('{{PRODUCTION_JSON}}', js_json(data), 1)
+              .replace('{{COMPONENT_NAME}}', name))
+    os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
+    open(out_path, 'w', encoding='utf-8').write(jsx)
+    print(f'built {out_path} ({os.path.getsize(out_path)//1024} KB) · component {name} · <Stage duration={data["total_duration_ms"]/1000} fps={data["canvas"]["fps"]}>')
+
 def build(json_path, out_path, story):
     verify_locked()
     data = json.load(open(json_path, encoding='utf-8'))
     tpl = open(os.path.join(ASSETS, 'story.template.html' if story else 'page.template.html'), encoding='utf-8').read()
     title = f"DATA STORY · {data.get('topic', 'story')}" if story else f"DATA STORY · {data['template_id']} · {data['id']}"
     # separators=(',', ':') reproduces JavaScript's JSON.stringify so builds from build.mjs and build.py are byte-identical
-    payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
+    payload = js_json(data)
     html = (tpl.replace('{{TITLE}}', title, 1)
                .replace('{{FONTS_CSS}}', open(os.path.join(ASSETS, 'fonts.css'), encoding='utf-8').read(), 1)
                .replace('{{ENGINE_JS}}', open(os.path.join(ASSETS, 'engine.js'), encoding='utf-8').read(), 1)
@@ -39,6 +76,6 @@ def build(json_path, out_path, story):
     print(f'built {out_path} ({os.path.getsize(out_path)//1024} KB) · sha256 {hashlib.sha256(html.encode()).hexdigest()[:16]}')
 
 if __name__ == '__main__':
-    args = sys.argv[1:]; story = '--story' in args; args = [a for a in args if a != '--story']
-    if len(args) != 2: sys.exit(__doc__)
-    build(args[0], args[1], story)
+    args = sys.argv[1:]; story = '--story' in args; stage = '--stage' in args; args = [a for a in args if a not in ('--story', '--stage')]
+    if len(args) not in (2, 3) or (len(args) == 3 and not stage): sys.exit(__doc__)
+    build_stage(args[0], args[1], args[2] if len(args) == 3 else None) if stage else build(args[0], args[1], story)
